@@ -2,16 +2,21 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy csproj and restore dependencies
-COPY RecipeParserV2.Api.csproj .
+# Copy solution and project files
+COPY *.sln .
+COPY RecipeParserV2.Api/*.csproj ./RecipeParserV2.Api/
+COPY RecipeParserV2.Service/*.csproj ./RecipeParserV2.Service/
+COPY RecipeParserV2.DAL/*.csproj ./RecipeParserV2.DAL/
+COPY RecipeParserV2.Models/*.csproj ./RecipeParserV2.Models/
+
+# Restore dependencies
 RUN dotnet restore
 
-# Copy source code and build
+# Copy source code
 COPY . .
-RUN dotnet build -c Release -o /app/build
 
-# Publish the application
-RUN dotnet publish -c Release -o /app/publish
+# Build and publish
+RUN dotnet publish RecipeParserV2.Api/RecipeParserV2.Api.csproj -c Release -o /app/publish
 
 # Use the official .NET 8 runtime image for running
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
